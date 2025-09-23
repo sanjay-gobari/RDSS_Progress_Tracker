@@ -1,14 +1,45 @@
 import React, { useEffect, useState } from 'react'
 import ActivityData from './ActivitiesData';
+import 'remixicon/fonts/remixicon.css'
+import "./App.css"
+
+const formFields = [
+  { name: "NameOfActivity", label: "Name of Activity", type: "dropdown" },
+  { name: "NameOfItem", label: "Name of Item", type: "dropdown" },
+  { name: "NameOfDivision", label: "Name of Division", type: "dropdown" },
+  { name: "NameOfSubDivision", label: "Name of Sub-Division", type: "dropdown" },
+  { name: "Date", label: "Date", type: "date" },
+  { name: "ErectedQty", label: "Erected Qty", type: "number" },
+  { name: "Unit", label: "Unit", type: "dropdown" },
+  { name: "Substation", label: "Substation", type: "dropdown" },
+  { name: "Feeder", label: "Feeder", type: "dropdown" },
+  { name: "Location", label: "Location", type: "text" },
+  { name: "NameOfContractor", label: "Name of Contractor", type: "text" },
+  { name: "ManPower", label: "Man Power", type: "number" },
+  { name: "Teams", label: "Teams", type: "number" },
+];
+
+
+
 function App() {
 
   const [selected, setSelected] = useState(ActivityData.MaterialType[0]);
   const [activityOptions, setActivityOptions] = useState([]);
   const [itemsOptions, setItemsOptions] = useState([]);
 
+  const [formData, setFormData] = useState(
+    {
+
+    }
+  )
+  const [dailyProgress, setDailyProgress] = useState([])
+
   const handleChange = (e) => {
     setSelected(e.target.value);
   }
+  const handleDelete = (index) => {
+    setDailyProgress((prev) => prev.filter((_, i) => i !== index));
+  };
 
   useEffect(() => {
 
@@ -26,37 +57,64 @@ function App() {
     }
   }, [selected])
 
-
+  const handleAddProgress = (e) => {
+    e.preventDefault();
+    const localFormData = new FormData(e.currentTarget);
+    const data = {};
+    formFields.forEach(elm => {
+      data[elm.name] = localFormData.get(elm.name);
+    });
+    setFormData(data);
+    setDailyProgress((progress) => [...progress, data])
+  };
 
   return (
-    <div className='p-4 max-w-[600px]'>
-      {ActivityData.MaterialType.map((option, index) => (
-        <Radio
-          key={index}
-          label={option}
-          checked={selected === option}
-          onChange={handleChange}
-          name="options"
-        />
-      ))}
-      <Dropdown label="Name of Activity" options={activityOptions} />
-      <Dropdown label="Name of Item" options={itemsOptions} />
-      <div className='grid grid-cols-2 gap-2'>
-        <Dropdown label="Name of Division" options={["Pithoragarh", "Dharchula", "Champawat"]} />
-        <Dropdown label="Name of Sub-Division" options={["Pithoragarh", "Lohaghat"]} />
+    <div className='h-screen  flex p-4 gap-4 bg-gray-100 '>
+      <div className='w-[500px] rounded-lg bg-white p-2'>
+        <div>
+          <h2 className='text-center text-2xl'>Enter Progress</h2>
+        </div>
+        <div className='my-4 grid grid-cols-3 place-items-center border border-gray-300 rounded-lg'>
+          {ActivityData.MaterialType.map((option, index) => (
+            <Radio
+              key={index}
+              label={option}
+              checked={selected === option}
+              onChange={handleChange}
+              name="options"
+            />
+          ))}
+          <hr className='my-hr' />
+        </div>
+        <form onSubmit={handleAddProgress} autocomplete="off" >
+          <div className='grid grid-cols-6 gap-2'>
+            {formFields.map((field, idx) => {
+
+              let myclass = "col-span-2";
+              if (field.type === "dropdown") {
+                let options = [];
+                if (field.name === "NameOfActivity") { options = activityOptions; myclass = "col-span-6" }
+                else if (field.name === "NameOfItem") { options = itemsOptions; myclass = "col-span-6" }
+                else if (field.name === "NameOfDivision") { options = ["Pithoragarh", "Dharchula", "Champawat"]; myclass = "col-span-3" }
+                else if (field.name === "NameOfSubDivision") { options = ["Pithoragarh", "Lohaghat"]; myclass = "col-span-3" }
+                else if (field.name === "Unit") options = ["KM", "Nos", "CKM"];
+                else if (field.name === "Substation") options = ["132/33/11 KV Pithoragarh S/S", "33/11KV Bin S/S", "CKM"];
+                else if (field.name === "Feeder") options = ["Town-1", "Town-2", "Town-3", "Town-4", "Bin"];
+                return <Dropdown key={idx} name={field.name} label={field.label} options={options} myclass={myclass} />
+              } else {
+                return <InputField key={idx} name={field.name} label={field.label} type={field.type} myclass={myclass} />
+              }
+            })}
+          </div>
+          <div className='pt-8 text-center '>
+            <Button1 type="Submit">Add</Button1>
+          </div>
+        </form>
+
       </div>
-      <div className='grid grid-cols-3 gap-2'>
-        <InputField label="Date" type="date" />
-        <InputField label="Erected Qty" type='number' />
-        <InputField label="Unit" />
-        <InputField label="Substation" />
-        <InputField label="Location" />
-        <InputField label="Name of Contractor" />
-        <InputField label="Man Power" type='number' />
-        <InputField label="Teams" type='number' />
-      </div>
-      <div className='pt-8 text-center'>
-        <Button1 text='Submit' type="Submit"/>
+      <div className='flex-1 bg-white rounded-lg p-2'>
+        <h2 className='w-full text-center text-2xl'>Today Progress</h2>
+        <DisplayDailyProgress data={dailyProgress} handleDelete={handleDelete} />
       </div>
     </div>
   )
@@ -66,33 +124,98 @@ export default App
 
 
 
-export function Dropdown({ label, options, value, onChange }) {
+export function Dropdown({ name, label, options, value, myclass }) {
+  const containerRef = React.useRef(null);
+  const [open, setOpen] = React.useState(false);
+  const [search, setSearch] = React.useState(value || "");
+
+  React.useEffect(() => {
+    setSearch(value || "");
+  }, [value]);
+
+  useEffect(() => {
+    setSearch("");
+    console.log("option change detected")
+  }, [options])
+
+  // Close dropdown when clicking outside
+  React.useEffect(() => {
+    function handleOutside(e) {
+      if (containerRef.current && !containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleOutside);
+    return () => document.removeEventListener("mousedown", handleOutside);
+  }, []);
+
+  const filteredOptions = options.filter(opt =>
+    opt.toLowerCase().includes(search.toLowerCase())
+  );
+
   return (
-    <div className="flex flex-col space-y-1 w-full">
-      <label className="text-sm font-medium text-gray-700">{label}</label>
-      <select
-        value={value}
-        onChange={onChange}
-        className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        {options.map((opt, idx) => (
-          <option key={idx} value={opt}>{opt}</option>
-        ))}
-      </select>
+    <div ref={containerRef} className={`flex flex-col w-full relative ${myclass}`}>
+      <label className="text-gray-700">{label}</label>
+      <div className='border border-gray-300 rounded-lg flex items-center pr-2'>
+        <input
+          type="text"
+          name={name}
+          className="outline-none p-2 w-full  rounded-lg bg-white cursor-text"
+          onClick={() => setOpen(true)}
+          onChange={(e) => setSearch(e.target.value)}
+          value={search}
+          placeholder="Select"
+          required
+        />
+        <button type='button'
+          title='clear field'
+          className='cursor-pointer duration-150 text-gray-400 hover:text-gray-800 rounded '
+          onClick={() => setSearch("")}
+        >
+          <svg className="w-5 h-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M10.5859 12L2.79297 4.20706L4.20718 2.79285L12.0001 10.5857L19.793 2.79285L21.2072 4.20706L13.4143 12L21.2072 19.7928L19.793 21.2071L12.0001 13.4142L4.20718 21.2071L2.79297 19.7928L10.5859 12Z"></path></svg>
+        </button>
+      </div>
+
+      {open && filteredOptions.length > 0 && (
+        <div className="absolute top-full left-0 w-full border rounded-lg bg-white mt-1 max-h-100 overflow-y-auto z-10">
+          {filteredOptions.map((opt, idx) => (
+            <div
+              key={idx}
+              className="p-2 hover:bg-blue-100 cursor-pointer"
+              onMouseDown={(e) => e.preventDefault()} // prevent losing focus
+              onClick={() => {
+                setSearch(opt);                // put option into box
+                setOpen(false);                // close dropdown
+              }}
+            >
+              {opt}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
 
-export function InputField({ label, type = "text", value, onChange, placeholder }) {
+
+
+
+
+export function InputField({ name, label, type = "text", value, onChange, placeholder, myclass }) {
+  if (type === "date") {
+    value = new Date().toISOString().split("T")[0];
+  }
   return (
-    <div className="flex flex-col space-y-1 w-full">
+    <div className={`flex flex-col space-y-1 w-full ${myclass}`}>
       <label className="text-sm font-medium text-gray-700">{label}</label>
       <input
+        name={name}
         type={type}
         value={value}
         onChange={onChange}
         placeholder={placeholder}
-        className="p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        className="p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        required
       />
     </div>
   );
@@ -102,8 +225,7 @@ export function InputField({ label, type = "text", value, onChange, placeholder 
 export function Radio({ label, checked, onChange, name }) {
   return (
     <label
-      className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 ${checked ? 'bg-blue-600 text-white' : 'bg-gray-100 text-gray-800'
-        }`}
+      className={`flex items-center p-3 rounded-lg cursor-pointer transition-all duration-200 `}
     >
       <input
         type="radio"
@@ -111,17 +233,69 @@ export function Radio({ label, checked, onChange, name }) {
         value={label}
         checked={checked}
         onChange={onChange}
-        className="w-5 h-5 accent-white mr-3 cursor-pointer"
+        className="w-5 h-5  mr-3 cursor-pointer"
       />
       {label}
     </label>
   );
 }
 
-export function Button1({ text = "button", onClick,type }) {
+export function Button1({ onClick, type, children }) {
   return (
-    <button 
-    className='cursor-pointer bg-blue-500 p-2 rounded text-white hover:bg-blue-400 duration-150' 
-    onClick={onClick} type={type}>{text}</button>
+    <button
+      className='cursor-pointer bg-blue-500 py-2 px-6 text-white hover:bg-blue-400 duration-150 rounded-full'
+      onClick={onClick}
+      type={type}>
+      {children}
+    </button>
   )
 }
+
+export const DisplayDailyProgress = ({ data, handleDelete }) => {
+  console.log(data)
+  return (
+    <>
+      <div className='border p-2'>
+        <div className='grid grid-cols-[2fr_repeat(13,1fr)] gap-1 place-items-center'>
+          {
+            formFields.map((elm, i) =>
+            (
+              <span className=''>{elm.label}</span>
+            )
+            )
+          }
+          <span className=''>Action</span>
+
+        </div>
+        {data.length != 0 && (
+          data.map((elm, i) => (
+            <div key={i} className='grid grid-cols-[2fr_repeat(13,1fr)] gap-1 place-items-center border-b my-2'>
+              <span>{elm.NameOfActivity}</span>
+              <span>{elm.NameOfItem}</span>
+              <span>{elm.NameOfDivision}</span>
+              <span>{elm.NameOfSubDivision}</span>
+              <span>{elm.Date}</span>
+              <span>{elm.ErectedQty} </span>
+              <span>{elm.Unit}</span>
+              <span>{elm.Substation}</span>
+              <span>{elm.Feeder}</span>
+              <span>{elm.Location}</span>
+              <span>{elm.NameOfContractor}</span>
+              <span>{elm.ManPower}</span>
+              <span>{elm.Teams}</span>
+              <div className='flex gap-3 text-xl'>
+                <button className='cursor-pointer text-green-600' title='Edit'><i className="ri-edit-line"></i></button>
+                <button className='cursor-pointer text-red-600' title='Delete' onClick={() => { handleDelete(i) }}><i className="ri-delete-bin-2-line"></i></button>
+              </div>
+            </div>
+          ))
+        )}
+        {data.length == 0 && (
+          <div>
+            <p className='text-center text-xl'>No Progress</p>
+          </div>
+        )}
+      </div>
+    </>);
+}
+

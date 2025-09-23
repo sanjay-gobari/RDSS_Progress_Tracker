@@ -49,15 +49,53 @@ export const PoleItems = [
     "DP - 11KV"
 ];
 
+
+
+export const Division = [
+    "Pithoragarh",
+    "Dharchula",
+    "Champawat"
+]
+export const SubDivision = [
+    "Pithoragarh",
+    "Gangolihat",
+    "Berinag",
+    "Dharchula",
+    "Didihat",
+    "Champawat",
+    "Lohaghat"
+]
+export const Substation = [
+    "S/S 132/33/11 KV Pithoragarh",
+    "S/S 33/11KV Bin",
+    "S/S Kanthgaon",
+    "S/S Chandak Bans"
+]
+export const Feeders = [
+    "Towm-1",
+    "Towm-2",
+    "Towm-3",
+    "Towm-4",
+    "Ancholi",
+    "Colony",
+    "Satsiling",
+    "Rai",
+    "Wadda"
+]
+
 // Optional: Export all as default object
 const ActivityData = {
+    MaterialType,
     ActivityListCableConductor,
     CableConductorItems,
     ActivityListVCB,
     VCBItems,
     ActivityListPole,
     PoleItems,
-    MaterialType,
+    Division,
+    SubDivision,
+    Substation,
+    Feeders
 };
 
 export default ActivityData;
