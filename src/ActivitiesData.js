@@ -66,7 +66,7 @@ export const SubDivision = [
     "Lohaghat"
 ]
 export const Substation = [
-    "S/S 132/33/11 KV Pithoragarh",
+    "S/S 132/33/11 KV PithoSragarh",
     "S/S 33/11KV Bin",
     "S/S Kanthgaon",
     "S/S Chandak Bans"
@@ -82,7 +82,7 @@ export const Feeders = [
     "Rai",
     "Wadda"
 ]
-
+export const Units =["KM", "Nos", "CKM"]
 // Optional: Export all as default object
 const ActivityData = {
     MaterialType,
@@ -95,7 +95,8 @@ const ActivityData = {
     Division,
     SubDivision,
     Substation,
-    Feeders
+    Feeders,
+    Units
 };
 
 export default ActivityData;

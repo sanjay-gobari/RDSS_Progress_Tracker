@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { memo, useEffect, useState } from 'react'
 import ActivityData from './ActivitiesData';
 import 'remixicon/fonts/remixicon.css'
 import "./App.css"
@@ -27,18 +27,36 @@ function App() {
   const [activityOptions, setActivityOptions] = useState([]);
   const [itemsOptions, setItemsOptions] = useState([]);
 
-  const [formData, setFormData] = useState(
-    {
+  const [formData, setFormData] = useState({});
 
-    }
-  )
   const [dailyProgress, setDailyProgress] = useState([])
 
   const handleChange = (e) => {
     setSelected(e.target.value);
   }
+
   const handleDelete = (index) => {
     setDailyProgress((prev) => prev.filter((_, i) => i !== index));
+  };
+
+   const handleProgressSubmit = async() => {
+    const c = confirm("Are you sure");
+    if (c && dailyProgress.length != 0) {
+      console.log(dailyProgress);
+      await fetch("http://localhost:5000/append", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(dailyProgress)
+      });
+
+      // Get saved data
+      const res = await fetch("http://localhost:5000/data");
+      const savedData = await res.json();
+      console.log(savedData);
+
+
+
+    }
   };
 
   useEffect(() => {
@@ -86,7 +104,7 @@ function App() {
           ))}
           <hr className='my-hr' />
         </div>
-        <form onSubmit={handleAddProgress} autocomplete="off" >
+        <form onSubmit={handleAddProgress} autoComplete="off" >
           <div className='grid grid-cols-6 gap-2'>
             {formFields.map((field, idx) => {
 
@@ -95,11 +113,11 @@ function App() {
                 let options = [];
                 if (field.name === "NameOfActivity") { options = activityOptions; myclass = "col-span-6" }
                 else if (field.name === "NameOfItem") { options = itemsOptions; myclass = "col-span-6" }
-                else if (field.name === "NameOfDivision") { options = ["Pithoragarh", "Dharchula", "Champawat"]; myclass = "col-span-3" }
-                else if (field.name === "NameOfSubDivision") { options = ["Pithoragarh", "Lohaghat"]; myclass = "col-span-3" }
-                else if (field.name === "Unit") options = ["KM", "Nos", "CKM"];
-                else if (field.name === "Substation") options = ["132/33/11 KV Pithoragarh S/S", "33/11KV Bin S/S", "CKM"];
-                else if (field.name === "Feeder") options = ["Town-1", "Town-2", "Town-3", "Town-4", "Bin"];
+                else if (field.name === "NameOfDivision") { options = ActivityData.Division; myclass = "col-span-3" }
+                else if (field.name === "NameOfSubDivision") { options = ActivityData.SubDivision; myclass = "col-span-3" }
+                else if (field.name === "Unit") options = ActivityData.Units;
+                else if (field.name === "Substation") options = ActivityData.Substation;
+                else if (field.name === "Feeder") options = ActivityData.Feeders;
                 return <Dropdown key={idx} name={field.name} label={field.label} options={options} myclass={myclass} />
               } else {
                 return <InputField key={idx} name={field.name} label={field.label} type={field.type} myclass={myclass} />
@@ -107,7 +125,7 @@ function App() {
             })}
           </div>
           <div className='pt-8 text-center '>
-            <Button1 type="Submit">Add</Button1>
+            <Button1 type="Submit" title="Add Progress">Add</Button1>
           </div>
         </form>
 
@@ -115,16 +133,17 @@ function App() {
       <div className='flex-1 bg-white rounded-lg p-2'>
         <h2 className='w-full text-center text-2xl'>Today Progress</h2>
         <DisplayDailyProgress data={dailyProgress} handleDelete={handleDelete} />
+        <div className='text-center p-2'>
+          <Button1 type="button" onClick={handleProgressSubmit} title="submit all Progress">Submit</Button1>
+        </div>
       </div>
     </div>
   )
 }
-
 export default App
 
 
-
-export function Dropdown({ name, label, options, value, myclass }) {
+function Dropdown({ name, label, options, value, myclass }) {
   const containerRef = React.useRef(null);
   const [open, setOpen] = React.useState(false);
   const [search, setSearch] = React.useState(value || "");
@@ -199,8 +218,6 @@ export function Dropdown({ name, label, options, value, myclass }) {
 
 
 
-
-
 export function InputField({ name, label, type = "text", value, onChange, placeholder, myclass }) {
   if (type === "date") {
     value = new Date().toISOString().split("T")[0];
@@ -240,11 +257,12 @@ export function Radio({ label, checked, onChange, name }) {
   );
 }
 
-export function Button1({ onClick, type, children }) {
+export function Button1({ onClick, type, title, children }) {
   return (
     <button
       className='cursor-pointer bg-blue-500 py-2 px-6 text-white hover:bg-blue-400 duration-150 rounded-full'
       onClick={onClick}
+      title={title}
       type={type}>
       {children}
     </button>
@@ -252,17 +270,15 @@ export function Button1({ onClick, type, children }) {
 }
 
 export const DisplayDailyProgress = ({ data, handleDelete }) => {
-  console.log(data)
+
   return (
     <>
       <div className='border p-2'>
         <div className='grid grid-cols-[2fr_repeat(13,1fr)] gap-1 place-items-center'>
           {
-            formFields.map((elm, i) =>
-            (
-              <span className=''>{elm.label}</span>
-            )
-            )
+            formFields.map((elm, i) => (
+              <span key={i} className=''>{elm.label}</span>
+            ))
           }
           <span className=''>Action</span>
 
