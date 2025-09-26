@@ -83,18 +83,17 @@ function AddProgress() {
         formFields.forEach(elm => {
             data[elm.name] = localFormData.get(elm.name);
         });
+        data.id= "RDSSLR" + Date.now();
         setFormData(data);
         setDailyProgress((progress) => [...progress, data])
     };
 
     return (
 
-        <div className='h-full flex p-4 gap-4 bg-gray-100 '>
-            <div className='w-[500px] rounded-lg bg-white p-2'>
-                <div>
-                    <h2 className='text-center text-2xl'>Enter Progress</h2>
-                </div>
-                <div className='my-4 grid grid-cols-3 place-items-center border border-gray-300 rounded-lg'>
+        <div className='h-full flex p-1 gap-1 bg-gray-100 '>
+            <div className='w-[460px] rounded-lg bg-white px-2'>
+                <h2 className='text-center text-2xl py-4'>Enter Progress</h2>
+                <div className='grid grid-cols-[2fr_repeat(2,1fr)] border border-gray-300 rounded-lg'>
                     {ActivityData.MaterialType.map((option, index) => (
                         <Radio
                             key={index}
@@ -104,7 +103,7 @@ function AddProgress() {
                             name="options"
                         />
                     ))}
-                    <hr className='my-hr' />
+
                 </div>
                 <form onSubmit={handleAddProgress} autoComplete="off" >
                     <div className='grid grid-cols-6 gap-2'>
@@ -132,8 +131,8 @@ function AddProgress() {
                 </form>
 
             </div>
-            <div className='flex-1 bg-white rounded-lg p-2'>
-                <h2 className='w-full text-center text-2xl'>Today Progress</h2>
+            <div className='flex-1 flex flex-col  overflow-auto rounded-lg px-2 bg-white'>
+                <h2 className='w-full text-center text-2xl p-4'>Today Progress</h2>
                 <DisplayDailyProgress data={dailyProgress} handleDelete={handleDelete} />
                 <div className='text-center p-2'>
                     <Button1 type="button" onClick={handleProgressSubmit} title="submit all Progress">Submit</Button1>
@@ -275,42 +274,51 @@ export const DisplayDailyProgress = ({ data, handleDelete }) => {
 
     return (
         <>
-            <div className='border p-2'>
-                <div className='grid grid-cols-[2fr_repeat(13,1fr)] gap-1 place-items-center'>
-                    {
-                        formFields.map((elm, i) => (
-                            <span key={i} className=''>{elm.label}</span>
-                        ))
-                    }
-                    <span className=''>Action</span>
+            <div className='flex-1 p-2 overflow-auto'>
+                <table className='text-center'>
+                    <thead>
+                        <tr className='border'>
+                            <th className='px-2 text-center border-r'>Sr No</th>
 
-                </div>
-                {data.length != 0 && (
-                    data.map((elm, i) => (
-                        <div key={i} className='grid grid-cols-[2fr_repeat(13,1fr)] gap-1 place-items-center border-b my-2'>
-                            <span>{elm.NameOfActivity}</span>
-                            <span>{elm.NameOfItem}</span>
-                            <span>{elm.NameOfDivision}</span>
-                            <span>{elm.NameOfSubDivision}</span>
-                            <span>{elm.Date}</span>
-                            <span>{elm.ErectedQty} </span>
-                            <span>{elm.Unit}</span>
-                            <span>{elm.Substation}</span>
-                            <span>{elm.Feeder}</span>
-                            <span>{elm.Location}</span>
-                            <span>{elm.NameOfContractor}</span>
-                            <span>{elm.ManPower}</span>
-                            <span>{elm.Teams}</span>
-                            <div className='flex gap-3 text-xl'>
-                                <button className='cursor-pointer text-green-600' title='Edit'><i className="ri-edit-line"></i></button>
-                                <button className='cursor-pointer text-red-600' title='Delete' onClick={() => { handleDelete(i) }}><i className="ri-delete-bin-2-line"></i></button>
-                            </div>
-                        </div>
-                    ))
-                )}
+                            {
+                                formFields.map((elm, i) => (
+                                    <th key={i} className={'border-r px-2 '}>{elm.label}</th>
+                                ))
+                            }
+                            <th className='px-2 text-center'>Action</th>
+                        </tr>
+
+                    </thead>
+                    <tbody>
+                        {data.length != 0 && (
+                            data.map((elm, i) => (
+                                <tr key={i} className='py-2 border'>
+                                    <td className='p-2 border-r'>{i+1}</td>
+                                    <td className='p-2 border-r'>{elm.NameOfActivity}</td>
+                                    <td className='p-2 border-r'>{elm.NameOfItem}</td>
+                                    <td className='p-2 border-r'>{elm.NameOfDivision}</td>
+                                    <td className='p-2 border-r'>{elm.NameOfSubDivision}</td>
+                                    <td className='p-2 border-r whitespace-nowrap'>{elm.Date}</td>
+                                    <td className='p-2 border-r'>{elm.ErectedQty} </td>
+                                    <td className='p-2 border-r'>{elm.Unit}</td>
+                                    <td className='p-2 border-r'>{elm.Substation}</td>
+                                    <td className='p-2 border-r'>{elm.Feeder}</td>
+                                    <td className='p-2 border-r'>{elm.Location}</td>
+                                    <td className='p-2 border-r'>{elm.NameOfContractor}</td>
+                                    <td className='p-2 border-r'>{elm.ManPower}</td>
+                                    <td className='p-2 border-r'>{elm.Teams}</td>
+                                    <td className='whitespace-nowrap'>
+                                        <button className='p-1 cursor-pointer text-green-600' title='Edit'><i className="ri-edit-line"></i></button>
+                                        <button className='p-1 cursor-pointer text-red-600' title='Delete' onClick={() => { handleDelete(i) }}><i className="ri-delete-bin-2-line"></i></button>
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
                 {data.length == 0 && (
-                    <div>
-                        <p className='text-center text-xl'>No Progress</p>
+                    <div className='border mt-2'>
+                        <p className='text-center text-xl py-2'>No Progress</p>
                     </div>
                 )}
             </div>

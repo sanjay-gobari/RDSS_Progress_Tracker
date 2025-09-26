@@ -18,7 +18,7 @@ export default Navbar;
 function NavBtn({ to = "/", children }) {
     return (
         <NavLink to={to}
-            className={({ isActive }) => (`p-4 rounded border ${isActive ? "bg-black text-white" : "bg-white "}`)}
+            className={({ isActive }) => (`p-2 rounded border ${isActive ? "bg-black text-white" : "bg-white "}`)}
         >
             {children}
         </NavLink>
