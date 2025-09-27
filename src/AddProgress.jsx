@@ -80,10 +80,13 @@ function AddProgress() {
         e.preventDefault();
         const localFormData = new FormData(e.currentTarget);
         const data = {};
-        formFields.forEach(elm => {
+        const fieldNames = [];
+        formFields.forEach((elm, i) => {
+            fieldNames.push(elm.name);
             data[elm.name] = localFormData.get(elm.name);
         });
-        data.id= "RDSSLR" + Date.now();
+        data.id = "RDSSLR" + Date.now();
+        data.names = fieldNames;
         setFormData(data);
         setDailyProgress((progress) => [...progress, data])
     };
@@ -274,15 +277,15 @@ export const DisplayDailyProgress = ({ data, handleDelete }) => {
 
     return (
         <>
-            <div className='flex-1 p-2 overflow-auto'>
-                <table className='text-center'>
+            <div className='flex-1 p-2 overflow-auto bg-neutral-50 rounded' >
+                <table className='text-center  '>
                     <thead>
-                        <tr className='border'>
-                            <th className='px-2 text-center border-r'>Sr No</th>
+                        <tr className='bg-neutral-200 '>
+                            <th className='px-2 text-center '>Sr No</th>
 
                             {
                                 formFields.map((elm, i) => (
-                                    <th key={i} className={'border-r px-2 '}>{elm.label}</th>
+                                    <th key={i} className={' px-2 '}>{elm.label}</th>
                                 ))
                             }
                             <th className='px-2 text-center'>Action</th>
@@ -290,31 +293,34 @@ export const DisplayDailyProgress = ({ data, handleDelete }) => {
 
                     </thead>
                     <tbody>
-                        {data.length != 0 && (
+                        {data.length !== 0 &&
                             data.map((elm, i) => (
-                                <tr key={i} className='py-2 border'>
-                                    <td className='p-2 border-r'>{i+1}</td>
-                                    <td className='p-2 border-r'>{elm.NameOfActivity}</td>
-                                    <td className='p-2 border-r'>{elm.NameOfItem}</td>
-                                    <td className='p-2 border-r'>{elm.NameOfDivision}</td>
-                                    <td className='p-2 border-r'>{elm.NameOfSubDivision}</td>
-                                    <td className='p-2 border-r whitespace-nowrap'>{elm.Date}</td>
-                                    <td className='p-2 border-r'>{elm.ErectedQty} </td>
-                                    <td className='p-2 border-r'>{elm.Unit}</td>
-                                    <td className='p-2 border-r'>{elm.Substation}</td>
-                                    <td className='p-2 border-r'>{elm.Feeder}</td>
-                                    <td className='p-2 border-r'>{elm.Location}</td>
-                                    <td className='p-2 border-r'>{elm.NameOfContractor}</td>
-                                    <td className='p-2 border-r'>{elm.ManPower}</td>
-                                    <td className='p-2 border-r'>{elm.Teams}</td>
+                                <tr key={i} className='py-2'>
+                                    <td> {i+1}</td>
+                                    {elm.names.map((el, j) => (
+                                        <td
+                                            key={j}
+                                            className={`p-2 ${el.toLowerCase() === "date" ? "whitespace-nowrap" : ""}`}
+                                        >
+                                            {elm[el]}
+                                        </td>
+                                    ))}
                                     <td className='whitespace-nowrap'>
-                                        <button className='p-1 cursor-pointer text-green-600' title='Edit'><i className="ri-edit-line"></i></button>
-                                        <button className='p-1 cursor-pointer text-red-600' title='Delete' onClick={() => { handleDelete(i) }}><i className="ri-delete-bin-2-line"></i></button>
+                                        <button className='p-1 cursor-pointer text-green-600' title='Edit'>
+                                            <i className="ri-edit-line"></i>
+                                        </button>
+                                        <button
+                                            className='p-1 cursor-pointer text-red-600'
+                                            title='Delete'
+                                            onClick={() => handleDelete(i)}
+                                        >
+                                            <i className="ri-delete-bin-2-line"></i>
+                                        </button>
                                     </td>
                                 </tr>
-                            ))
-                        )}
+                            ))}
                     </tbody>
+
                 </table>
                 {data.length == 0 && (
                     <div className='border mt-2'>

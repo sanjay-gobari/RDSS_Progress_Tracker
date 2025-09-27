@@ -72,17 +72,18 @@ export const Substation = [
     "S/S Chandak Bans"
 ]
 export const Feeders = [
-    "Towm-1",
-    "Towm-2",
-    "Towm-3",
-    "Towm-4",
+    "Town-1",
+    "Town-2",
+    "Town-3",
+    "Town-4",
     "Ancholi",
     "Colony",
     "Satsiling",
     "Rai",
-    "Wadda"
+    "Wadda",
+    
 ]
-export const Units =["KM", "Nos", "CKM"]
+export const Units =["M","KM", "Nos", "CKM"]
 // Optional: Export all as default object
 const ActivityData = {
     MaterialType,
