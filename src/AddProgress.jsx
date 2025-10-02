@@ -277,56 +277,59 @@ export const DisplayDailyProgress = ({ data, handleDelete }) => {
 
     return (
         <>
-            <div className='flex-1 p-2 overflow-auto bg-neutral-50 rounded' >
-                <table className='text-center  '>
-                    <thead>
-                        <tr className='bg-neutral-200 '>
-                            <th className='px-2 text-center '>Sr No</th>
+            <div className='w-full flex-1 p-2 overflow-auto bg-neutral-50 rounded' >
+                <div className='min-w-full'>
+                    {data.length !== 0 ? (<table className='min-w-full text-center  '>
+                        <thead>
+                            <tr className='bg-neutral-200 '>
+                                <th className='px-2 text-center '>Sr No</th>
 
-                            {
-                                formFields.map((elm, i) => (
-                                    <th key={i} className={' px-2 '}>{elm.label}</th>
-                                ))
-                            }
-                            <th className='px-2 text-center'>Action</th>
-                        </tr>
+                                {
+                                    formFields.map((elm, i) => (
+                                        <th key={i} className={' px-2 '}>{elm.label}</th>
+                                    ))
+                                }
+                                <th className='px-2 text-center'>Action</th>
+                            </tr>
 
-                    </thead>
-                    <tbody>
-                        {data.length !== 0 &&
-                            data.map((elm, i) => (
-                                <tr key={i} className='py-2'>
-                                    <td> {i+1}</td>
-                                    {elm.names.map((el, j) => (
-                                        <td
-                                            key={j}
-                                            className={`p-2 ${el.toLowerCase() === "date" ? "whitespace-nowrap" : ""}`}
-                                        >
-                                            {elm[el]}
+                        </thead>
+                        <tbody>
+                            {data.length !== 0 &&
+                                data.map((elm, i) => (
+                                    <tr key={i} className='py-2'>
+                                        <td> {i + 1}</td>
+                                        {elm.names.map((el, j) => (
+                                            <td
+                                                key={j}
+                                                className={`p-2 ${el.toLowerCase() === "date" ? "whitespace-nowrap" : ""}`}
+                                            >
+                                                {elm[el]}
+                                            </td>
+                                        ))}
+                                        <td className='whitespace-nowrap'>
+                                            <button className='p-1 cursor-pointer text-green-600' title='Edit'>
+                                                <i className="ri-edit-line"></i>
+                                            </button>
+                                            <button
+                                                className='p-1 cursor-pointer text-red-600'
+                                                title='Delete'
+                                                onClick={() => handleDelete(i)}
+                                            >
+                                                <i className="ri-delete-bin-2-line"></i>
+                                            </button>
                                         </td>
-                                    ))}
-                                    <td className='whitespace-nowrap'>
-                                        <button className='p-1 cursor-pointer text-green-600' title='Edit'>
-                                            <i className="ri-edit-line"></i>
-                                        </button>
-                                        <button
-                                            className='p-1 cursor-pointer text-red-600'
-                                            title='Delete'
-                                            onClick={() => handleDelete(i)}
-                                        >
-                                            <i className="ri-delete-bin-2-line"></i>
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                    </tbody>
+                                    </tr>
+                                ))}
+                        </tbody>
 
-                </table>
-                {data.length == 0 && (
-                    <div className='border mt-2'>
-                        <p className='text-center text-xl py-2'>No Progress</p>
-                    </div>
-                )}
+                    </table>)
+                        : (
+                            <div className='min-w-full bg-white rounded-lg mt-2'>
+                                <p className='min-w-full text-center text-xl py-2'>No Progress</p>
+                            </div>
+                        )
+                    }
+                </div>
             </div>
         </>);
 }
