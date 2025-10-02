@@ -34,7 +34,8 @@ const ViewProgress = () => {
   }
 
   // Use the "names" array from the first object as column headers
-  const headers = data[0].names;
+  const headers = data[0].labels;
+  const tBody= data[0].names;
 
   return (
     <div className="w-full p-4 overflow-auto bg-neutral-50 rounded shadow">
@@ -53,7 +54,7 @@ const ViewProgress = () => {
           {data.map((row, i) => (
             <tr key={row.id} className="hover:bg-gray-100">
               <td className="px-2 py-1 border">{i + 1}</td>
-              {headers.map((head, j) => (
+              {tBody.map((head, j) => (
                 <td
                   key={j}
                   className={`px-2 py-1 border whitespace-nowrap`}

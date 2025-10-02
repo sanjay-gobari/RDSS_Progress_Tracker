@@ -9,13 +9,13 @@ const formFields = [
     { name: "NameOfItem", label: "Name of Item", type: "dropdown" },
     { name: "NameOfDivision", label: "Name of Division", type: "dropdown" },
     { name: "NameOfSubDivision", label: "Name of Sub-Division", type: "dropdown" },
-    { name: "Date", label: "Date", type: "date" },
-    { name: "ErectedQty", label: "Erected Qty", type: "number" },
-    { name: "Unit", label: "Unit", type: "dropdown" },
     { name: "Substation", label: "Substation", type: "dropdown" },
     { name: "Feeder", label: "Feeder", type: "dropdown" },
     { name: "Location", label: "Location", type: "text" },
     { name: "NameOfContractor", label: "Name of Contractor", type: "text" },
+    { name: "Date", label: "Date", type: "date" },
+    { name: "ErectedQty", label: "Erected Qty", type: "number" },
+    { name: "Unit", label: "Unit", type: "dropdown" },
     { name: "ManPower", label: "Man Power", type: "number" },
     { name: "Teams", label: "Teams", type: "number" },
 ];
@@ -81,12 +81,15 @@ function AddProgress() {
         const localFormData = new FormData(e.currentTarget);
         const data = {};
         const fieldNames = [];
+        const fieldLabels = [];
         formFields.forEach((elm, i) => {
+            fieldLabels.push(elm.label);
             fieldNames.push(elm.name);
             data[elm.name] = localFormData.get(elm.name);
         });
         data.id = "RDSSLR" + Date.now();
         data.names = fieldNames;
+        data.labels = fieldLabels;
         setFormData(data);
         setDailyProgress((progress) => [...progress, data])
     };
@@ -128,18 +131,24 @@ function AddProgress() {
                             }
                         })}
                     </div>
-                    <div className='pt-8 text-center '>
-                        <Button1 type="Submit" title="Add Progress">Add</Button1>
+                    <div className='pt-8 m-auto w-fit '>
+                        <Button1 className=" flex gap-2" type="Submit" title="Add Progress">
+                            <svg className='w-[1.2rem]' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.0001 10.9999L22.0002 10.9997L22.0002 12.9997L13.0001 12.9999L13.0001 21.9998L11.0001 21.9998L11.0001 12.9999L2.00004 13.0001L2 11.0001L11.0001 10.9999L11 2.00025L13 2.00024L13.0001 10.9999Z"></path></svg>
+                            <span>Add Progress</span>
+                        </Button1>
                     </div>
                 </form>
 
             </div>
-            <div className='flex-1 flex flex-col  overflow-auto rounded-lg px-2 bg-white'>
+            <div className='flex-1 flex flex-col  overflow-auto rounded-lg px-2 bg-neutral-50'>
                 <h2 className='w-full text-center text-2xl p-4'>Today Progress</h2>
-                <DisplayDailyProgress data={dailyProgress} handleDelete={handleDelete} />
-                <div className='text-center p-2'>
-                    <Button1 type="button" onClick={handleProgressSubmit} title="submit all Progress">Submit</Button1>
+                <div className='w-fit ml-auto p-2'>
+                    <Button1 type="button" className="flex items-center" onClick={handleProgressSubmit} title="submit all Progress">
+                        <span className='whitespace-nowrap '>Submit Progress</span>
+                        <svg className='w-[1.4rem] mt-[2px]' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M13.1717 12.0007L8.22192 7.05093L9.63614 5.63672L16.0001 12.0007L9.63614 18.3646L8.22192 16.9504L13.1717 12.0007Z"></path></svg>
+                    </Button1>
                 </div>
+                <DisplayDailyProgress data={dailyProgress} handleDelete={handleDelete} />
             </div>
         </div>
     )
@@ -261,10 +270,10 @@ export function Radio({ label, checked, onChange, name }) {
     );
 }
 
-export function Button1({ onClick, type, title, children }) {
+export function Button1({ onClick, type, title, children,className }) {
     return (
         <button
-            className='cursor-pointer bg-blue-500 py-2 px-6 text-white hover:bg-blue-400 duration-150 rounded-full'
+            className={`cursor-pointer bg-blue-500 py-2 px-4 text-white hover:bg-blue-400 duration-150 rounded-full ${className}`}
             onClick={onClick}
             title={title}
             type={type}>
@@ -277,7 +286,7 @@ export const DisplayDailyProgress = ({ data, handleDelete }) => {
 
     return (
         <>
-            <div className='w-full flex-1 p-2 overflow-auto bg-neutral-50 rounded' >
+            <div className='w-full flex-1 p-2 overflow-auto  rounded' >
                 <div className='min-w-full'>
                     {data.length !== 0 ? (<table className='min-w-full text-center  '>
                         <thead>
