@@ -2,12 +2,12 @@ import { NavLink } from "react-router-dom";
 
 function Navbar() {
     return (
-        <nav className="p-4 flex gap-2 justify-center">
-            <NavBtn to="/add" className="rounded-l-4xl rounded-r-lg ">
+        <nav className="p-4 flex gap-4 justify-center">
+            <NavBtn to="/add" >
                 Add Progress
             </NavBtn>
-            <NavBtn to="/view" className="rounded-l-lg rounded-r-4xl">
-                View Progress
+            <NavBtn to="/view" >
+                View All Progress
             </NavBtn>
         </nav>
     );
@@ -15,10 +15,10 @@ function Navbar() {
 
 export default Navbar;
 
-function NavBtn({ to = "/", children,className }) {
+function NavBtn({ to = "/", children,className="" }) {
     return (
         <NavLink to={to}
-            className={({ isActive }) => (`p-2 px-4 border border-black ${isActive ? "bg-black text-white" : "bg-white "} ${className}`)}
+            className={({ isActive }) => (` pb-1 font-semibold ${isActive ? "border-b-2 text-blue-600 border-blue-600 " : "bg-white text-gray-700 "} ${className}`)}
         >
             {children}
         </NavLink>

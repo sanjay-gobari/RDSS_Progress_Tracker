@@ -94,11 +94,22 @@ function AddProgress() {
         setDailyProgress((progress) => [...progress, data])
     };
 
+    const [localFormData,setLocalFormData] = useState({})
+    function handleInputChange(e) {
+        const { name, value } = e.target; // get input's name and value
+        console.log(name, value); // debug
+
+        // if you’re managing state:
+        setLocalFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    }
     return (
 
         <div className='h-full flex p-1 gap-1 bg-gray-100 '>
             <div className='w-[460px] rounded-lg bg-white px-2'>
-                <h2 className='text-center text-2xl py-4'>Enter Progress</h2>
+                <h2 className='text-center text-2xl font-semibold py-4'>Enter Progress</h2>
                 <div className='grid grid-cols-[2fr_repeat(2,1fr)] border border-gray-300 rounded-lg'>
                     {ActivityData.MaterialType.map((option, index) => (
                         <Radio
@@ -127,7 +138,7 @@ function AddProgress() {
                                 else if (field.name === "Feeder") options = ActivityData.Feeders;
                                 return <Dropdown key={idx} name={field.name} label={field.label} options={options} myclass={myclass} />
                             } else {
-                                return <InputField key={idx} name={field.name} label={field.label} type={field.type} myclass={myclass} />
+                                return <InputField key={idx} name={field.name} label={field.label} type={field.type} myclass={myclass} value={localFormData[field.name] || ""} onChange={handleInputChange} />
                             }
                         })}
                     </div>
@@ -141,7 +152,7 @@ function AddProgress() {
 
             </div>
             <div className='flex-1 flex flex-col  overflow-auto rounded-lg px-2 bg-neutral-50'>
-                <h2 className='w-full text-center text-2xl p-4'>Today Progress</h2>
+                <h2 className='w-full text-center text-2xl font-semibold p-4'>Today Progress</h2>
                 <div className='w-fit ml-auto p-2'>
                     <Button1 type="button" className="flex items-center" onClick={handleProgressSubmit} title="submit all Progress">
                         <span className='whitespace-nowrap '>Submit Progress</span>
@@ -232,7 +243,7 @@ function Dropdown({ name, label, options, value, myclass }) {
 
 
 export function InputField({ name, label, type = "text", value, onChange, placeholder, myclass }) {
-    if (type === "date") {
+    if (type === "date" && value==="") {
         value = new Date().toISOString().split("T")[0];
     }
     return (
@@ -270,7 +281,7 @@ export function Radio({ label, checked, onChange, name }) {
     );
 }
 
-export function Button1({ onClick, type, title, children,className }) {
+export function Button1({ onClick, type, title, children, className }) {
     return (
         <button
             className={`cursor-pointer bg-blue-500 py-2 px-4 text-white hover:bg-blue-400 duration-150 rounded-full ${className}`}
@@ -307,12 +318,12 @@ export const DisplayDailyProgress = ({ data, handleDelete }) => {
                                 data.map((elm, i) => (
                                     <tr key={i} className='py-2'>
                                         <td> {i + 1}</td>
-                                        {elm.names.map((el, j) => (
+                                        {elm.names.map((fieldName, j) => (
                                             <td
                                                 key={j}
-                                                className={`p-2 ${el.toLowerCase() === "date" ? "whitespace-nowrap" : ""}`}
+                                                className={`p-2 ${fieldName.toLowerCase() === "date" ? "whitespace-nowrap" : ""}`}
                                             >
-                                                {elm[el]}
+                                                {elm[fieldName]}
                                             </td>
                                         ))}
                                         <td className='whitespace-nowrap'>
